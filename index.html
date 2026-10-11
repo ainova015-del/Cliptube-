@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101114">
+  <title>ClipNova — Watch. Create. Share.</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <button id="menuBtn" class="icon-btn" aria-label="Toggle menu">☰</button>
+    <a class="brand" href="#"><span class="brand-mark">▶</span> Clip<span>Nova</span></a>
+    <form id="searchForm" class="search">
+      <input id="searchInput" type="search" placeholder="Search videos, creators, topics" aria-label="Search videos">
+      <button aria-label="Search">⌕</button>
+    </form>
+    <div class="top-actions">
+      
+      <button id="loginBtn" class="login-btn">Sign in with Google</button>
+      <button id="profileBtn" class="profile-btn hidden" title="Account">●</button>
+    </div>
+  </header>
+
+  <nav id="sidebar" class="bottom-nav" aria-label="Main navigation">
+    <button class="nav-item active" data-view="home"><span class="nav-icon">⌂</span><span>Home</span></button>
+    <button class="nav-item" data-view="shorts"><span class="nav-icon">▣</span><span>Shorts</span></button>
+    <button id="uploadNavBtn" class="upload-nav" aria-label="Upload video">＋</button>
+    <button class="nav-item" data-view="subscriptions"><span class="nav-icon">▤</span><span>Subscribe</span></button>
+    <button id="accountNavBtn" class="nav-item"><span class="nav-icon">◉</span><span>Account</span></button>
+  </nav>
+
+  <main class="main">
+    <div id="chips" class="chips">
+      <button class="chip selected" data-category="All">All</button>
+      <button class="chip" data-category="Music">Music</button>
+      <button class="chip" data-category="Gaming">Gaming</button>
+      <button class="chip" data-category="Education">Education</button>
+      <button class="chip" data-category="Technology">Technology</button>
+      <button class="chip" data-category="Entertainment">Entertainment</button>
+      <button class="chip" data-category="Comedy">Comedy</button>
+      <button class="chip" data-category="News">News</button>
+    </div>
+    <section id="status" class="status">Connect Firebase in <code>firebase-config.js</code> to enable shared accounts, uploads and public videos.</section>
+    <section id="videoGrid" class="video-grid" aria-live="polite"></section>
+    <section id="shortsView" class="shorts-view hidden"></section>
+    <section id="emptyState" class="empty-state hidden">
+      <div class="empty-icon">▶</div><h2>No videos found</h2><p>Try another search or upload the first video.</p>
+    </section>
+  </main>
+
+  <dialog id="uploadDialog" class="dialog">
+    <form id="uploadForm" class="dialog-content">
+      <button type="button" class="close-btn" data-close="uploadDialog">×</button>
+      <h2>Upload a video</h2>
+      <p class="muted">Share original content you have the rights to publish.</p>
+      <label>Video title<input name="title" required maxlength="100" placeholder="Give your video a title"></label>
+      <label>Description<textarea name="description" maxlength="3000" rows="3" placeholder="Tell viewers about your video"></textarea></label>
+      <label>Category<select name="category" required>
+        <option>Education</option><option>Gaming</option><option>Music</option><option>Technology</option><option>Entertainment</option><option>Comedy</option><option>News</option><option>Other</option>
+      </select></label>
+      <label>Post type<select name="mediaType" id="mediaType"><option value="video">Video</option><option value="photo">Photo / Image</option></select></label>
+      <label id="videoTypeLabel">Video type<select name="type"><option value="long">Long video</option><option value="short">Shorts (vertical video)</option></select></label>
+      <label id="mediaFileLabel">Video file<input name="mediaFile" id="mediaFile" type="file" accept="video/mp4,video/webm,video/quicktime" required></label>
+      <label id="thumbnailLabel">Thumbnail (optional)<input name="thumbnail" type="file" accept="image/jpeg,image/png,image/webp"></label>
+      <div id="uploadProgress" class="muted"></div>
+      <button class="primary-btn full" type="submit">Upload video</button>
+    </form>
+  </dialog>
+
+  <dialog id="playerDialog" class="dialog player-dialog">
+    <div class="dialog-content player-content">
+      <button type="button" class="close-btn" data-close="playerDialog">×</button>
+      <video id="player" controls playsinline></video>
+      <h2 id="playerTitle"></h2><p id="playerMeta" class="muted"></p>
+      <p id="playerDescription"></p>
+      <div class="player-actions">
+        <button id="likeBtn" class="soft-btn">♡ Like</button>
+        <button id="subscribeBtn" class="soft-btn">＋ Subscribe</button>
+        <button id="shareBtn" class="soft-btn">↗ Share</button>
+      </div>
+      <h3>Comments</h3>
+      <form id="commentForm" class="comment-form"><input name="comment" maxlength="1000" placeholder="Add a comment…" required><button class="primary-btn">Comment</button></form>
+      <div id="commentsList" class="comments-list"></div>
+    </div>
+  </dialog>
+
+  <dialog id="accountDialog" class="dialog account-dialog">
+    <div class="dialog-content">
+      <button class="close-btn" data-close="accountDialog">×</button>
+      <h2>Your account & channel</h2>
+      <div id="accountInfo"></div>
+      <form id="profileForm" class="profile-form">
+        <h3>Profile</h3>
+        <label>Display name<input name="displayName" maxlength="60" required placeholder="Your name"></label>
+        <label>Profile photo<input name="profilePhoto" type="file" accept="image/jpeg,image/png,image/webp"></label>
+        <h3>Channel branding</h3>
+        <label>Channel name<input name="channelName" maxlength="80" placeholder="Your channel name"></label>
+        <label>Channel logo<input name="channelLogo" type="file" accept="image/jpeg,image/png,image/webp"></label>
+        <label>Channel banner<input name="channelBanner" type="file" accept="image/jpeg,image/png,image/webp"></label>
+        <label>Channel description<textarea name="bio" maxlength="500" rows="3" placeholder="Tell viewers about your channel"></textarea></label>
+        <div id="profileProgress" class="muted"></div>
+        <button class="primary-btn full" type="submit">Save profile & channel</button>
+      </form>
+      <button id="logoutBtn" class="soft-btn logout-button">Sign out</button>
+    </div>
+  </dialog>
+
+  <dialog id="adminDialog" class="dialog">
+    <div class="dialog-content"><button class="close-btn" data-close="adminDialog">×</button><h2>Admin panel</h2><p class="muted">Only the UID configured in <code>firebase-config.js</code> as <code>ADMIN_UID</code> can access moderation controls.</p><div id="adminList"></div></div>
+  </dialog>
+  <div id="toast" class="toast" role="status"></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
